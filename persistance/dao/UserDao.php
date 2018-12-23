@@ -13,18 +13,17 @@ class UserDao extends Connection
     private $table = 'users';
 
     public function getUserByEmail($email){
-        $sql = "SELECT * FROM $this->table WHERE email=$email";
+        $sql = "SELECT * FROM $this->table WHERE email='$email'";
         $result = parent::query($sql);
         if ($result->num_rows === 0) {
             return null;
-        } else {
-            $record = $result->fetch_object();
+        }
+        if ($record = $result->fetch_object())
             return new User(
                 $record->id,
                 $record->name,
                 $record->password,
                 $record->email);
-        }
     }
 
     public function getUserById($id){

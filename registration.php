@@ -1,19 +1,22 @@
 <?php
 require_once('persistance/dao/UserDao.php');
 require_once('persistance/model/User.php');
+require_once('persistance/dto/UserDto.php');
 
 $email_error_msg = "";
 $user_error_msg = "";
 $password_error_msd = "";
 $passwords_error_msg = "";
 $is_valid = true;
+$userDao = new UserDao();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     validate();
     if ($is_valid) {
-        $user = new UserDto($_POST["name"], $_POST["email"], $_POST["password"], $_POST["conf_password"]);
-        $userDao = new UserDao();
+        $user = new UserDto($_POST["name"], $_POST["email"], $_POST["password"], $_POST["confPassword"]);
         $userDao -> addUser($user);
+        header("location: login.php");
+        die();
     }
 }
 
@@ -27,6 +30,14 @@ function validate(){
     if (!filter_var($_POST["email"], FILTER_VALIDATE_EMAIL)){
         global $is_valid, $email_error_msg;
         $email_error_msg = "Email is not valid";
+        $is_valid = false;
+    }
+
+    global $userDao;
+    $queried_user = $userDao -> getUserByEmail($_POST["email"]);
+    if ($queried_user != null) {
+        global $is_valid, $email_error_msg;
+        $email_error_msg = "User with such email exists";
         $is_valid = false;
     }
 
@@ -88,7 +99,7 @@ function validate(){
         </div>
         <div class="form-group">
             <label for="inputPass2">Confirm Password</label>
-            <input name="confPassword" type="password" id="inputPass2" class="form-control" placeholder="Confirm password" value="<?php echo $_POST["conf_password"]?>"/>
+            <input name="confPassword" type="password" id="inputPass2" class="form-control" placeholder="Confirm password" value="<?php echo $_POST["confPassword"]?>"/>
             <?php
             ?>
         </div>

@@ -7,12 +7,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $userDao = new UserDao();
     $user = $userDao->getUserByEmail($_POST["email"]);
     if ($user === null) {
-        $error_message = "Login or password are wrong";
+        $error_message = "Email or password are wrong";
     } else {
         if ($user->getPassword() != $_POST["password"]){
-            $error_message = "Login or password are wrong";
+            $error_message = "Email or password are wrong";
         } else {
-            /// set cookie
+            setcookie("id", $user->getId(), time() + 60 * 60);
+            header("location: blog.php");
+            die();
         }
     }
 }
@@ -44,10 +46,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <button type="submit" style="margin-bottom: 25px;" class="btn btn-primary">Submit</button>
     </form>
 
-<!--    <div th:if="${param.error}" class="alert alert-danger" role="alert">-->
-<!--        Incorrect email and password-->
-<!--    </div>-->
-<!---->
+    <?php
+    if ($error_message != ""){
+       echo "<div class=\"alert alert-danger\" role=\"alert\">$error_message</div>";
+    }
+    ?>
+
 <!--    <div th:if="${param.logout}" class="alert alert-success" role="alert">-->
 <!--        You have been logged out!-->
 <!--    </div>-->
